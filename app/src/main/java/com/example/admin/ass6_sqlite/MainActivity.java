@@ -12,146 +12,139 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.util.ArrayList; import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     private StudentAdapter mAdapter;
-    private List<Student> studentList = new ArrayList<>();
-    private RecyclerView studentRecyclerView;
+    private List<Student> studentList = new ArrayList<Student>();
+    private RecyclerView studentsRecyclerView;
     private Button addButton;
-
     private DatabaseHelper db;
-
     @Override
-    protected void onCreate(Bundle saveInstanceState){
-        super.onCreate(saveInstanceState);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         addButton = findViewById(R.id.button_add);
-        studentRecyclerView=findViewById(R.id.recycler_view_student);
+        studentsRecyclerView = findViewById(R.id.recycler_view_student);
 
         db = new DatabaseHelper(this);
-        studentList.addAll(db.getAllStudents());
-
+        studentList.addAll(db.getAllStudent());
         addButton.setOnClickListener(new View.OnClickListener() {
+
             @Override
-            public void onClick(View view) {
+            public void onClick(View v) {
                 showStudentDialog(false,null,-1);
             }
         });
-
-        mAdapter = new StudentAdapter(this, studentList);
+        mAdapter = new StudentAdapter(this,studentList);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-        studentRecyclerView.setLayoutManager(mLayoutManager);
-        studentRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        studentRecyclerView.setAdapter(mAdapter);
+        studentsRecyclerView.setLayoutManager(mLayoutManager);
+        studentsRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        studentsRecyclerView.setAdapter(mAdapter);
 
-        studentRecyclerView.addOnItemTouchListener(new RecyclerTouchListener(this,
-                studentRecyclerView,new RecyclerTouchListener.ClickListener(){
+        studentsRecyclerView.addOnItemTouchListener(new RecyclerTouchListener(this, studentsRecyclerView, new RecyclerTouchListener.ClickListener() {
+
             @Override
-            public void onClick(View view, final int position){
+            public void onClick(View view, int position) {
+
             }
+
             @Override
-            public void onLongClick(View view, int position){showActionsDialog(position);}
+            public void onLongClick(View view, int position) {
+                showActionsDialog(position);
+            }
         }));
     }
-
-    private void createStudent(String id, String name){
-        db.insertStudent(id, name);
+    public void createStudent(String id,String name,String track){
+        db.insertStudent(id,name,track);
         Student student = db.getStudent(id);
         if(student != null){
-            studentList.add(0, student);
+            studentList.add(0,student);
             mAdapter.notifyDataSetChanged();
         }
     }
+    public void updateStudent(String id,String name,String track,int position){
 
-    private void updateStudent(String id, String name, int position){
-        Student student = studentList.get(position);
-
+        Student student;
+        student = studentList.get(position);
         student.setId(id);
         student.setName(name);
-
+        student.setTrack(track);
         db.updateStudent(student);
 
-        studentList.set(position, student);
+        studentList.set(position ,student);
         mAdapter.notifyItemChanged(position);
     }
-
-    private void deleteStudent(int position) {
+    private void deleteStudent(int position){
         db.deleteStudent(studentList.get(position));
-
         studentList.remove(position);
         mAdapter.notifyItemRemoved(position);
     }
-
-    private void showStudentDialog(final boolean shouldUpdate, final Student student, final  int position) {
+    private void showStudentDialog(final boolean shouldUpdate,final Student student,final int position){
         LayoutInflater layoutInflaterAndroid = LayoutInflater.from(getApplicationContext());
-        View view =  layoutInflaterAndroid.inflate(R.layout.student_dialog,null);
-
+        View view = layoutInflaterAndroid.inflate(R.layout.student_dialog,null);
         AlertDialog.Builder alertDialogBuilderUserInput = new AlertDialog.Builder(MainActivity.this);
         alertDialogBuilderUserInput.setView(view);
 
         final EditText inputId = view.findViewById(R.id.edit_text_id);
-        final EditText inputName = view.findViewById(R.id.edit_text_name);
+        final EditText inputNames = view.findViewById(R.id.edit_text_name);
+        final EditText inputTrack = view.findViewById(R.id.edit_text_track);
         TextView dialogTitle = view.findViewById(R.id.text_view_dialog_title);
         dialogTitle.setText(!shouldUpdate ? "New Student" : "Edit Student");
 
         if(shouldUpdate && student != null){
             inputId.setText(student.getId());
-            inputName.setText(student.getName());
+            inputNames.setText(student.getName());
+            inputTrack.setText(student.getTrack());
+
         }
-        alertDialogBuilderUserInput
-                .setCancelable(false)
-                .setPositiveButton(shouldUpdate ? "update" : "save", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialogBox, int id) {
+        alertDialogBuilderUserInput.setCancelable(false).setPositiveButton(shouldUpdate ? "update" : "save", new DialogInterface.OnClickListener(){
 
-                    }
-                })
-                .setNegativeButton("cancel",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialogBox, int which) {
-                                dialogBox.cancel();
-                            }
-                        });
+            @Override
+            public void onClick(DialogInterface dialogBox, int id) {
 
+            }
+        }).setNegativeButton("cancle",new DialogInterface.OnClickListener(){
+
+            @Override
+            public void onClick(DialogInterface dialogBox, int id) {
+                dialogBox.cancel();
+            }
+        });
         final AlertDialog alertDialog = alertDialogBuilderUserInput.create();
         alertDialog.show();
 
-        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener(){
+
             @Override
             public void onClick(View v) {
-                if (TextUtils.isEmpty(inputId.getText().toString())) {
-                    Toast.makeText(MainActivity.this, "Enter ID!", Toast.LENGTH_SHORT).show();
+                if(TextUtils.isEmpty(inputId.getText().toString())){
+                    Toast.makeText(MainActivity.this,"Enter ID!",Toast.LENGTH_SHORT).show();
                     return;
                 } else {
                     alertDialog.dismiss();
                 }
-                if (shouldUpdate && student != null){
-                    updateStudent(inputId.getText().toString(),inputName.getText().toString(),position);
-                }
-                else {
-                    createStudent(inputId.getText().toString(), inputName.getText().toString());
+                if(shouldUpdate && student != null){
+                    updateStudent(inputId.getText().toString(),inputNames.getText().toString(),inputTrack.getText().toString(),position);
+                } else {
+                    createStudent(inputId.getText().toString(),inputNames.getText().toString(),inputTrack. getText().toString());
                 }
             }
         });
     }
-
-    private void showActionsDialog(final int position) {
-        CharSequence colors[] = new CharSequence[]{"Edit", "Delete"};
-
+    private void showActionsDialog(final int position){
+        CharSequence colors[] = new CharSequence[]{"Edit","Delete"};
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Choose option");
         builder.setItems(colors, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if(which == 0) {
-                    showStudentDialog(true, studentList.get(position), position);
+                if(which == 0){
+                    showStudentDialog(true,studentList.get(position),position);
                 } else {
                     deleteStudent(position);
                 }
@@ -159,7 +152,4 @@ public class MainActivity extends AppCompatActivity {
         });
         builder.show();
     }
-
-
 }
-
