@@ -9,7 +9,8 @@ public class Student {
     private String id;
     private String name;
     private String track;
-    public static final String CREATE_TABLE ="CREATE TABLE " + TABLE_NAME + "("+ COLUMN_ID + " TEXT,"+ COLUMN_NAME + " TEXT,"+ COLUMN_TRACK + " TEXT"+ ")";
+    public static final String CREATE_TABLE ="CREATE TABLE " + TABLE_NAME + "("+ COLUMN_ID + " TEXT,"+
+            COLUMN_NAME + " TEXT,"+ COLUMN_TRACK + " TEXT"+ ")";
     public Student(String id,String name,String track){
         this.id = id;
         this.name = name;

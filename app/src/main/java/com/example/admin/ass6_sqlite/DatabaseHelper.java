@@ -36,12 +36,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = db.query(Student.TABLE_NAME,
-                new String[]{Student.COLUMN_ID,Student.COLUMN_NAME,Student.COLUMN_TRACK},Student.COLUMN_ID + "=?",new String[]{String.valueOf(id)},null,null,null,null);
+                new String[]{Student.COLUMN_ID,Student.COLUMN_NAME,Student.COLUMN_TRACK},Student.COLUMN_ID +
+                        "=?",new String[]{String.valueOf(id)},null,null,null,null);
         if(cursor != null){
             cursor.moveToFirst();
         }
         Student student = new Student(
-                cursor.getString(cursor.getColumnIndex(Student.COLUMN_ID)),cursor.getString(cursor.getColumnIndex(Student.COLUMN_NAME)),cursor.getString(cursor.getColumnIndex(Student.COLUMN_TRACK)));
+                cursor.getString(cursor.getColumnIndex(Student.COLUMN_ID)),
+                cursor.getString(cursor.getColumnIndex(Student.COLUMN_NAME)),
+                cursor.getString(cursor.getColumnIndex(Student.COLUMN_TRACK)));
 
         cursor.close();
         return student;     }
@@ -70,12 +73,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(Student.COLUMN_NAME,student.getName());
         values.put(Student.COLUMN_TRACK,student.getTrack());
 
-        return db.update(Student.TABLE_NAME,values,Student.COLUMN_ID + " = ?",new String[]{String.valueOf(student.getId())});
+        return db.update(Student.TABLE_NAME,values,Student.COLUMN_ID + " = ?",
+                new String[]{String.valueOf(student.getId())});
 
     }     public void deleteStudent(Student student){
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(Student.TABLE_NAME,Student.COLUMN_ID + " = ? ", new String[]{String.valueOf(student.getId())});
+        db.delete(Student.TABLE_NAME,Student.COLUMN_ID + " = ? ",
+                new String[]{String.valueOf(student.getId())});
         db.close();
     }
-
 }

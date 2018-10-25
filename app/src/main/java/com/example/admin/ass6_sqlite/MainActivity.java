@@ -46,7 +46,8 @@ public class MainActivity extends AppCompatActivity {
         studentsRecyclerView.setItemAnimator(new DefaultItemAnimator());
         studentsRecyclerView.setAdapter(mAdapter);
 
-        studentsRecyclerView.addOnItemTouchListener(new RecyclerTouchListener(this, studentsRecyclerView, new RecyclerTouchListener.ClickListener() {
+        studentsRecyclerView.addOnItemTouchListener(new RecyclerTouchListener(this, studentsRecyclerView,
+                new RecyclerTouchListener.ClickListener() {
 
             @Override
             public void onClick(View view, int position) {
@@ -102,7 +103,8 @@ public class MainActivity extends AppCompatActivity {
             inputTrack.setText(student.getTrack());
 
         }
-        alertDialogBuilderUserInput.setCancelable(false).setPositiveButton(shouldUpdate ? "update" : "save", new DialogInterface.OnClickListener(){
+        alertDialogBuilderUserInput.setCancelable(false).setPositiveButton(shouldUpdate ? "update" : "save",
+                new DialogInterface.OnClickListener(){
 
             @Override
             public void onClick(DialogInterface dialogBox, int id) {
